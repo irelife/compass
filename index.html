@@ -6970,7 +6970,9 @@ function persist(){
 let listPref="all", listQuery="", listOpen=false;
 // アプリシティの県（表示・フィルタ用）
 function prefOf(p){
-  if(p.pref) return p.pref;
+  // 県名だけに正規化（"広島県福山市"→"広島県" などの表記ゆれを吸収）
+  const norm=v=>{ if(!v) return ""; const m=String(v).match(/(広島県|岡山県)/); return m?m[1]:v; };
+  if(p.pref) return norm(p.pref);
   if(p.id==="apricity") return "広島県"; // アプリシティは福山＝広島
   if(p.id==="ideal") return "広島県"; // アイディールは福山＝広島
   if(p.id==="asym") return "広島県"; // アシンプトートは福山＝広島
