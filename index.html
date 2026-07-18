@@ -531,6 +531,67 @@ table{font-size:13px;} th{background:var(--sl-100);color:var(--foam-dim);font-we
 /* 詳細内カードを揃える */
 .pdetail-panel .card{border-radius:var(--r-lg);border:1px solid var(--line);box-shadow:var(--sh-sm);}
 
+
+/* ── 文字拡大（詳細画面を読みやすく・CSSのみ／査定の数値は不変） ── */
+.pdetail-panel{font-size:16px;}
+.pmeta h3{font-size:30px !important;}
+.pmeta .tag{font-size:15px !important;}
+/* 近隣物件テーブル */
+.nbtable{font-size:16px !important;}
+.nbtable-hd,.nbtable th{font-size:14px !important;}
+.nbtable td,.nbtable tr{font-size:16px !important;}
+.nb-nm{font-size:17px !important;font-weight:600;}
+.nb-madori,.nb-age{font-size:15px !important;}
+.nbtable-note,.nbstory-note{font-size:13px !important;}
+/* 稼働率・満室平均・入退去の各テーブル */
+.pdetail-panel table{font-size:16px !important;}
+.pdetail-panel table th{font-size:14px !important;}
+.pdetail-panel table td{font-size:16px !important;padding:9px 12px !important;}
+/* 号室別チップ */
+.chip,.rentchip{font-size:16px !important;padding:6px 12px !important;}
+/* 説明・注記・見出し */
+.desc{font-size:15px !important;line-height:1.75 !important;}
+.note{font-size:13px !important;line-height:1.7 !important;}
+.lead-p{font-size:16px !important;line-height:1.8 !important;}
+.sub-h,.blk-h{font-size:18px !important;font-weight:700 !important;}
+.nbstory-lbl{font-size:16px !important;font-weight:600;}
+.nbstory-meta,.nbstory-occ,.nbstory-trend{font-size:15px !important;}
+.eff-formula{font-size:15px !important;line-height:1.8 !important;}
+.scope{font-size:15px !important;}
+/* 数値の大きな見どころは特に大きく */
+.big,.kpi-v,.metric-v{font-size:1.15em !important;}
+
+
+/* ── 入退去実績テーブルを見やすく（A＋B：矢印・色・行の色分け・数字拡大） ── */
+.pooltable{font-size:17px !important;border-collapse:separate;border-spacing:0;width:100%;}
+.pooltable th{font-size:14px !important;background:#f1f5f9 !important;color:#64748b !important;
+  padding:11px 12px !important;font-weight:600 !important;}
+.pooltable td{padding:12px 12px !important;border-bottom:1px solid #eef2f7 !important;vertical-align:middle;}
+.pooltable .pool-room{font-weight:700;font-size:18px;color:#0f172a;}
+.pooltable .pool-date{color:#475569;font-size:16px;white-space:nowrap;}
+.pooltable .pool-vac{color:#64748b;font-size:15px;}
+/* 前→後の変化 */
+.pool-change{white-space:nowrap;}
+.pool-pre{color:#94a3b8;font-size:17px;text-decoration:line-through;text-decoration-color:#cbd5e1;}
+.pool-post{font-size:20px;font-weight:700;color:#0f172a;}
+.pool-arrow{margin:0 8px;font-weight:700;font-size:16px;color:#94a3b8;}
+.pool-arrow.up{color:#059669;} .pool-arrow.down{color:#dc2626;}
+/* 増減（大きく・アイコン付き） */
+.pool-diff{font-size:20px !important;font-weight:800 !important;white-space:nowrap;}
+.pool-diff .pool-tri{font-size:13px;margin-right:5px;vertical-align:1px;}
+.pool-diff.up{color:#059669 !important;}
+.pool-diff.down{color:#dc2626 !important;}
+.pool-diff.flat{color:#94a3b8 !important;}
+/* 備考 */
+.pooltable .tostate{font-size:15px;color:#475569;}
+/* 行の色分け（B） */
+.pooltable tr.pool-up td{background:#f0fdf4;}
+.pooltable tr.pool-down td{background:#fef2f2;}
+.pooltable tr.pool-flat td{background:#fff;}
+.pooltable tr:hover td{filter:brightness(.98);}
+.busy-chip{background:#fff7ed;color:#c2410c;border-radius:6px;padding:2px 8px;font-size:12px;font-weight:600;}
+.pool-sum{font-size:14px;color:#64748b;font-weight:500;}
+
 @media(prefers-reduced-motion:reduce){ *{transition:none !important;} }
 </style>
 </head>
@@ -8354,22 +8415,29 @@ function neighborStoryHtml(p){
     const rowsHtml=pool.slice().reverse().map(t=>{
       const room=t[0], out=t[2], sign=t[3], days=t[4], pre=t[5], post=t[6], busy=t[8], state=t[9]||"";
       const diff=(Number.isFinite(pre)&&Number.isFinite(post))?post-pre:null;
-      const diffCls=diff==null?"":(diff>0?"chg-up":(diff<0?"chg-down":"chg-flat"));
+      const dir=diff==null?"flat":(diff>0?"up":(diff<0?"down":"flat"));
+      const rowCls=dir==="up"?"pool-up":(dir==="down"?"pool-down":"pool-flat");
+      const arrow=dir==="up"?"▲":(dir==="down"?"▼":"—");
       const diffTxt=diff==null?"—":(diff>0?`+${diff.toLocaleString()}`:(diff<0?`${diff.toLocaleString()}`:"±0"));
-      return `<tr>
-        <td>${room}</td>
-        <td>${sign||"—"}</td>
-        <td class="num">${days!=null?days+"日":"—"}</td>
-        <td class="num">${Number.isFinite(pre)?pre.toLocaleString():"—"}</td>
-        <td class="num">${Number.isFinite(post)?post.toLocaleString():"—"}</td>
-        <td class="num ${diffCls}">${diffTxt}</td>
+      const preS=Number.isFinite(pre)?pre.toLocaleString():"—";
+      const postS=Number.isFinite(post)?post.toLocaleString():"—";
+      return `<tr class="${rowCls}">
+        <td class="pool-room">${room}</td>
+        <td class="pool-date">${out||"—"}</td>
+        <td class="num pool-vac">${days!=null?days+"日":"—"}</td>
+        <td class="num pool-change">
+          <span class="pool-pre">${preS}</span>
+          <span class="pool-arrow ${dir}">→</span>
+          <span class="pool-post">${postS}</span>
+        </td>
+        <td class="num pool-diff ${dir}"><span class="pool-tri">${arrow}</span>${diffTxt}</td>
         <td class="tostate">${busy?'<span class="busy-chip">繁忙</span> ':''}${state}</td>
       </tr>`;
     }).join("");
     poolHtml=`
       <div class="nbstory-lbl" style="margin:12px 0 6px">入退去の実績（成約賃料の増減・空室期間）　<span class="pool-sum">増額${up}・減額${down}・据置${flat}</span></div>
       <table class="pooltable">
-        <thead><tr><th>号室</th><th>退去日</th><th class="num">空室</th><th class="num">前賃料</th><th class="num">後賃料</th><th class="num">増減</th><th>備考</th></tr></thead>
+        <thead><tr><th>号室</th><th>退去日</th><th class="num">空室</th><th class="num">賃料の変化（前→後）</th><th class="num">増減</th><th>備考</th></tr></thead>
         <tbody>${rowsHtml}</tbody>
       </table>`;
   }
