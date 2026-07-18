@@ -10,17 +10,16 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
 :root{
-  --ink:#1a1a1a;        /* near-black text */
-  --brass:#111111;      /* accent = black (was brass) */
-  --brass-dim:#666666;  /* mid gray */
-  --sea:#f6f6f4;        /* panel = light gray paper */
-  --sea-2:#eeeeec;
-  --foam:#1a1a1a;       /* primary text = black */
-  --foam-dim:#6b6b6b;   /* secondary text = gray */
-  --coral:#c0392b;      /* loss (kept for P&L clarity) */
-  --jade:#1a7a4a;       /* gain (kept for P&L clarity) */
-  --line:rgba(0,0,0,.14);
-  --sans:"Helvetica Neue",Arial,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+  /* shadcn/ui 相当（変数名は既存のまま・値だけ差し替え） */
+  --ink:#0f172a; --brass:#115e59; --brass-dim:#64748b;
+  --sea:#ffffff; --sea-2:#f8fafc; --foam:#0f172a; --foam-dim:#64748b;
+  --coral:#e11d48; --jade:#047857; --line:#e2e8f0;
+  --sans:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+  --sl-100:#f1f5f9; --sl-200:#e2e8f0; --sl-300:#cbd5e1; --sl-400:#94a3b8;
+  --teal-50:#f0fdfa; --teal-700:#0f766e; --teal-900:#134e4a;
+  --r:.5rem; --r-lg:.75rem;
+  --sh-sm:0 1px 2px 0 rgb(0 0 0 / .05);
+  --sh-md:0 4px 6px -1px rgb(0 0 0 / .1), 0 2px 4px -2px rgb(0 0 0 / .1);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{
@@ -462,6 +461,77 @@ input:focus,select:focus{outline:none;border-color:var(--brass)}
 .nodata-badge{display:inline-block;background:#6b7280;color:#fff;font-weight:800;font-size:14px;
   padding:6px 14px;border-radius:8px;margin:6px 0 10px;letter-spacing:.02em}
 .nodata-text{font-size:12.5px;color:var(--foam-dim);line-height:1.7}
+
+/* ══ shadcn/ui スキン（CSSのみ・JSには触れていません） ══ */
+body{background:var(--sea-2);font-size:14px;line-height:1.5;}
+.wrap{max-width:1600px;padding:0 24px 80px;}
+header{padding:16px 24px;margin:0 -24px 0;border-bottom:1px solid var(--line);background:#fff;position:sticky;top:0;z-index:30;}
+.brand h1{font-size:20px;letter-spacing:.28em;font-weight:600;}
+.brand .sub{font-size:10px;letter-spacing:.22em;color:var(--foam-dim);}
+.rose{width:36px;height:36px;} .tagline{font-size:13px;}
+.layout{gap:24px;margin-top:24px;}
+.side h2{font-size:12px;letter-spacing:.06em;color:var(--foam-dim);font-weight:600;}
+.preftabs{gap:6px;}
+.preftabs .ptab{border-radius:var(--r);padding:8px 10px;font-size:13px;font-weight:500;background:#fff;border:1px solid var(--line);color:var(--foam-dim);box-shadow:var(--sh-sm);transition:background-color .15s,color .15s,border-color .15s;}
+.preftabs .ptab:hover{background:var(--sl-100);color:var(--foam);}
+.preftabs .ptab.on{background:var(--ink);border-color:var(--ink);color:#fff;box-shadow:none;}
+.psearch{border-radius:var(--r);border:1px solid var(--line);background:#fff;padding:8px 12px;font-size:14px;height:40px;box-shadow:var(--sh-sm);}
+.psearch:focus{border-color:var(--ink);outline:2px solid var(--ink);outline-offset:1px;}
+.psearch::placeholder{color:var(--sl-400);}
+button{font-family:inherit;}
+.btn,.addbtn,button.primary,button.ghost{border-radius:var(--r);font-size:14px;font-weight:500;transition:background-color .15s,color .15s,border-color .15s;}
+input[type=text],input[type=number],input[type=date],input[type=time],select,textarea{border-radius:var(--r);border:1px solid var(--line);background:#fff;font-size:14px;padding:8px 12px;}
+input[type=text]:focus,input[type=number]:focus,select:focus,textarea:focus{outline:2px solid var(--ink);outline-offset:1px;border-color:var(--ink);}
+.drop,.dropzone,.uploadbox{border-radius:var(--r-lg);border:1px dashed var(--sl-300);background:#fff;}
+.drop:hover,.dropzone:hover,.uploadbox:hover{border-color:var(--brass-dim);background:var(--sl-100);}
+table{font-size:13px;} th{background:var(--sl-100);color:var(--foam-dim);font-weight:500;} th,td{border-color:var(--line);}
+.chg-up,.up,.gain{color:var(--jade);} .chg-down,.down,.loss{color:var(--coral);}
+.foot{color:var(--sl-400);font-size:11px;}
+.leaflet-container{border-radius:var(--r-lg);}
+
+/* 段階B：サマリーカード */
+.scgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin:16px 0 20px;}
+@media(min-width:900px){ .scgrid{grid-template-columns:repeat(4,1fr);} }
+.sccard{background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:14px 16px;box-shadow:var(--sh-sm);}
+.scl{display:flex;align-items:center;gap:7px;font-size:12px;color:var(--foam-dim);margin-bottom:8px;}
+.scdot{width:8px;height:8px;border-radius:9999px;flex:none;}
+.scdot.teal{background:var(--brass);} .scdot.em{background:var(--jade);} .scdot.am{background:#d97706;} .scdot.sl{background:var(--sl-400);}
+.scv{font-size:26px;font-weight:600;line-height:1.15;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.01em;}
+.scu{font-size:15px;font-weight:500;margin-left:1px;} .scs{margin-top:4px;font-size:11px;color:var(--sl-400);}
+
+/* 段階B：サイドバー物件カード */
+.pcard{border-radius:var(--r-lg) !important;border:1px solid var(--line);background:#fff;box-shadow:var(--sh-sm);transition:box-shadow .15s,border-color .15s;}
+.pcard:hover{box-shadow:var(--sh-md);border-color:var(--sl-300);}
+.pcard.on{border-color:var(--brass);box-shadow:0 0 0 1px var(--brass);}
+.pn{font-size:14px;font-weight:600;color:var(--ink);} .pm{font-size:11.5px;color:var(--foam-dim);}
+.sbadge,.pbadge{border-radius:var(--r);font-size:10.5px;font-weight:500;padding:2px 7px;box-shadow:inset 0 0 0 1px rgb(0 0 0 / .06);}
+.sbadge.ok{background:#ecfdf5;color:var(--jade);} .sbadge.warn{background:#fffbeb;color:#b45309;}
+.sbadge.na{background:var(--sl-100);color:var(--sl-400);} .pbadge{background:var(--sl-100);color:var(--foam-dim);}
+
+/* ── 段階C：詳細モーダルを seisou 調に ── */
+.pdetail-backdrop{background:rgba(15,23,42,.5);}
+.pdetail-panel{border-radius:var(--r-lg);box-shadow:0 10px 15px -3px rgb(0 0 0/.1),0 4px 6px -4px rgb(0 0 0/.1);
+  padding:28px 30px 36px;}
+.pdetail-close{border-radius:var(--r);border:1px solid var(--line);background:#fff;color:var(--foam-dim);
+  width:32px;height:32px;font-size:15px;transition:background-color .15s,color .15s;}
+.pdetail-close:hover{background:var(--sl-100);color:var(--foam);}
+.pmeta h3{font-size:26px;letter-spacing:-.01em;}
+.pmeta .tag{font-size:13px;}
+.pdfbtn{border-radius:var(--r);border:1px solid var(--line);color:var(--foam-dim);background:#fff;
+  font-weight:500;transition:background-color .15s,color .15s,border-color .15s;}
+.pdfbtn:hover{background:var(--brass);color:#fff;border-color:var(--brass);}
+.scope{background:var(--sl-100);border-radius:var(--r);color:var(--foam-dim);}
+.scope b{color:var(--foam);}
+/* タブを seisou のセグメント調に */
+.tabs{gap:6px;border-bottom:1px solid var(--line);padding-bottom:0;}
+.tab{border-radius:var(--r) var(--r) 0 0;font-weight:500;color:var(--foam-dim);}
+.tab:hover{color:var(--foam);background:var(--sl-100);}
+.tab.on{color:var(--brass);}
+.tab.on::after{background:var(--brass);}
+/* 詳細内カードを揃える */
+.pdetail-panel .card{border-radius:var(--r-lg);border:1px solid var(--line);box-shadow:var(--sh-sm);}
+
+@media(prefers-reduced-motion:reduce){ *{transition:none !important;} }
 </style>
 </head>
 <body>
@@ -7811,8 +7881,27 @@ function renderMapView(){
       </div>
     </details>`;
 
+  let statsHtml="";
+  try{
+    let ready=0,na=0,short=0,analyzable=0,recSum=0,recN=0;
+    props.forEach(p=>{
+      const r=proposalReadiness(p);
+      if(r.ineligible) na++; else if(r.ready) ready++; else short++;
+      if(p.history){ analyzable++; const rec=forecast10(p).recRate; if(Number.isFinite(rec)){ recSum+=rec; recN++; } }
+    });
+    const avg = recN ? Math.round((recSum/recN)*10)/10 : null;
+    const card=(l,v,s,t)=>`<div class="sccard"><div class="scl"><span class="scdot ${t}"></span>${l}</div><div class="scv">${v}</div><div class="scs">${s}</div></div>`;
+    statsHtml=`<div class="scgrid">
+      ${card("登録物件", props.length, "広島・岡山の管理物件", "teal")}
+      ${card("提案作成可", ready, `不足あり ${short}件 ・ 対象外 ${na}件`, "em")}
+      ${card("分析可（履歴あり）", analyzable, `全体の ${props.length?Math.round(analyzable/props.length*100):0}%`, "sl")}
+      ${card("推奨料率 平均", avg==null?"—":`${avg}<span class="scu">%</span>`, recN?`${recN}件の平均`:"算出対象なし", "am")}
+    </div>`;
+  }catch(e){ statsHtml=""; }
+
   m.innerHTML=`<div class="mapwrap">
     <h3>🗺 新築査定</h3>
+    ${statsHtml}
     ${alertHtml}
     ${updateBoxHtml}
 
